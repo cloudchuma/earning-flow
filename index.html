@@ -1,295 +1,105 @@
-<!doctype html>
-<html lang="en">
-<link rel="stylesheet" href="izy-clark-app-flow.css">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>IZYDON — Clark Earnings Flow</title>
-    <style>
-        /* --- CLARK DESIGN CSS --- */
-        body {
-            font-family: sans-serif;
-            background: #f0f2f5;
-            margin: 0;
-            padding: 0;
-        }
+<<<<<<< HEAD <!doctype html>
+    <html lang="en">
+    <link rel="stylesheet" href="izy-clark-app-flow.css">
 
-        .app {
-            max-width: 480px;
-            margin: auto;
-            background: #fff;
-            padding: 1rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>IZYDON — Clark Earnings Flow</title>
+    </head>
 
-        .site-header {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .brand .title {
-            font-weight: 700;
-            font-size: 1.3rem;
-            color: #0056b3;
-        }
-
-        .brand .subtitle {
-            font-size: 0.9rem;
-            color: #b30000;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-        }
-
-        .top-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 0.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            background: #e0e0e0;
-            color: #333;
-        }
-
-        .tab.active {
-            background: #0056b3;
-            color: #fff;
-        }
-
-        .meta-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .month-card,
-        .pct-card {
-            flex: 1;
-            background: #f7f7f7;
-            padding: 0.5rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .muted {
-            color: #777;
-            font-size: 0.8rem;
-        }
-
-        .big-number {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: #0056b3;
-        }
-
-        .pct-badge {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: #b30000;
-        }
-
-        .actions {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            margin-bottom: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .actions label {
-            font-size: 0.8rem;
-            color: #555;
-        }
-
-        select,
-        input {
-            padding: 0.4rem;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            width: 80px;
-        }
-
-        .btn {
-            padding: 0.5rem 0.8rem;
-            background: #0056b3;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
-        }
-
-        .btn.ghost {
-            background: #f7f7f7;
-            color: #b30000;
-            border: 1px solid #b30000;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-            margin-bottom: 1rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 0.5rem;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .sale-input {
-            width: 80px;
-            text-align: right;
-        }
-
-        .run,
-        .comm {
-            font-weight: 700;
-        }
-
-        .input-error {
-            border: 2px solid #b30000;
-        }
-
-        .footer-actions {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .totals {
-            display: flex;
-            gap: 1rem;
-            justify-content: space-around;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat {
-            text-align: center;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="app">
-        <header class="site-header" role="banner">
-            <div class="brand">
-                <img src="logo.png" alt="IZYDON logo" class="logo" />
-                <div>
-                    <div class="title">IZYDON</div>
-                    <div class="subtitle">Clark Earnings</div>
-                </div>
-            </div>
-            <div class="top-tabs" role="tablist" aria-label="Mode">
-                <button id="agentBtn" class="tab inactive" role="tab" aria-selected="false">AGENT</button>
-                <button id="clarkBtn" class="tab active" role="tab" aria-selected="true">CLARKS</button>
-            </div>
-        </header>
-
-        <section class="meta-row" aria-hidden="false">
-            <div class="month-card" aria-live="polite">
-                <div class="muted small">Month</div>
-                <div id="monthName" class="big-number">—</div>
-            </div>
-            <div class="pct-card">
-                <div class="muted small">Agreed with agent</div>
-                <div id="selectedPct" class="pct-badge">—</div>
-            </div>
-        </section>
-
-        <main>
-            <div class="top-actions">
-                <div class="actions">
-                    <label class="muted" for="percentSelect">Select agreed %</label>
-                    <select id="percentSelect" aria-label="Agreed percentage">
-                        <option value="5">5%</option>
-                        <option value="8">8%</option>
-                        <option value="10" selected>10%</option>
-                        <option value="12">12%</option>
-                        <option value="15">15%</option>
-                        <option value="20">20%</option>
-                        <option value="custom">Custom...</option>
-                    </select>
-                    <input id="customPct" type="number" min="0" max="100" placeholder="custom %"
-                        aria-label="Custom percentage" />
-                </div>
-
-                <div class="actions">
-                    <button class="btn add-day">+ Add date</button>
-                    <button class="btn ghost" id="clearMonthBtn">Clear month</button>
-                </div>
-
-                <div class="actions">
-                    <button class="btn ghost" id="exportData">Export JSON</button>
-                    <input type="file" id="importData" accept=".json" />
-                </div>
-            </div>
-
-            <div class="table-wrap" role="region" aria-label="Daily sales">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Sales (₦)</th>
-                            <th scope="col">Commission (₦)</th>
-                            <th scope="col">Running total (₦)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="daysBody"></tbody>
-                </table>
-            </div>
-
-            <footer>
-                <div class="totals" aria-live="polite">
-                    <div class="stat">
-                        <div class="small muted">Total sales</div>
-                        <div id="totalSales">₦0</div>
+    <body>
+        <div class="app">
+            <header class="site-header" role="banner">
+                <div class="brand">
+                    <img src="logo.png" alt="IZYDON logo" class="logo" />
+                    <div>
+                        <div class="title">IZYDON</div>
+                        <div class="subtitle">Clark Earnings</div>
                     </div>
-                    <div class="stat">
-                        <div class="small muted">Total earned</div>
-                        <div id="totalEarned">₦0.00</div>
+                </div>
+                <div class="top-tabs" role="tablist" aria-label="Mode">
+                    <button id="agentBtn" class="tab inactive" role="tab" aria-selected="false">AGENT</button>
+                    <button id="clarkBtn" class="tab active" role="tab" aria-selected="true">CLARKS</button>
+                </div>
+            </header>
+
+            <section class="meta-row" aria-hidden="false">
+                <div class="month-card" aria-live="polite">
+                    <div class="muted small">Month</div>
+                    <div id="monthName" class="big-number">—</div>
+                </div>
+                <div class="pct-card">
+                    <div class="muted small">Agreed with agent</div>
+                    <div id="selectedPct" class="pct-badge">—</div>
+                </div>
+            </section>
+
+            <main>
+                <div class="top-actions">
+                    <div class="actions">
+                        <label class="muted" for="percentSelect">Select agreed %</label>
+                        <select id="percentSelect" aria-label="Agreed percentage">
+                            <option value="5">5%</option>
+                            <option value="8">8%</option>
+                            <option value="10" selected>10%</option>
+                            <option value="12">12%</option>
+                            <option value="15">15%</option>
+                            <option value="20">20%</option>
+                            <option value="custom">Custom...</option>
+                        </select>
+                        <input id="customPct" type="number" min="0" max="100" placeholder="custom %"
+                            aria-label="Custom percentage" />
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn add-day">+ Add date</button>
+                        <button class="btn ghost" id="clearMonthBtn">Clear month</button>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn ghost" id="exportData">Export JSON</button>
+                        <input type="file" id="importData" accept=".json" />
                     </div>
                 </div>
 
-                <div class="footer-actions">
-                    <button class="btn add-day">+ Add date</button>
-                    <button id="calcBtn" class="btn">Calculate month</button>
+                <div class="table-wrap" role="region" aria-label="Daily sales">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Sales (₦)</th>
+                                <th scope="col">Commission (₦)</th>
+                                <th scope="col">Running total (₦)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daysBody"></tbody>
+                    </table>
                 </div>
-            </footer>
-        </main>
-    </div>
 
-<script src="izy-clark-app-flow.js">
+                <footer>
+                    <div class="totals" aria-live="polite">
+                        <div class="stat">
+                            <div class="small muted">Total sales</div>
+                            <div id="totalSales">₦0</div>
+                        </div>
+                        <div class="stat">
+                            <div class="small muted">Total earned</div>
+                            <div id="totalEarned">₦0.00</div>
+                        </div>
+                    </div>
 
-</script>
-</body>
+                    <div class="footer-actions">
+                        <button class="btn add-day">+ Add date</button>
+                        <button id="calcBtn" class="btn">Calculate month</button>
+                    </div>
+                </footer>
+            </main>
+        </div>
 
-</html>
+        <script src="izy-clark-app-flow.js">
 
-   
+        </script>
+    </body>
+
+    </html>
