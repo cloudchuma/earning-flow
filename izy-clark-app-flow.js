@@ -3,19 +3,24 @@
     const percentSelect = document.getElementById('percentSelect');
     const customPct = document.getElementById('customPct');
     const selectedPctEl = document.getElementById('selectedPct');
+
     const daysBody = document.getElementById('daysBody');
     const addDayBtns = document.querySelectorAll('.add-day');
+
     const totalSalesEl = document.getElementById('totalSales');
     const totalEarnedEl = document.getElementById('totalEarned');
+
     const clearMonthBtn = document.getElementById('clearMonthBtn');
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
     const importFile = document.getElementById('importFile');
+
     const monthNameEl = document.getElementById('monthName');
     const calcBtn = document.getElementById('calcBtn');
 
     let state = { percent: 10, entries: [], lastAddedDate: null };
 
+    // Format money
     const money = v => '₦' + (Number(v || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     function parseNumberInput(raw) {
@@ -31,12 +36,21 @@
         return Number(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    function toLocalDateStr(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    // Recompute commissions
     function recompute() {
         state.entries.forEach(e => {
             e.commission = +((Number(e.sale) || 0) * (state.percent / 100));
         });
     }
 
+    // Recompute running "you owe"
     function recomputeYouOwe() {
         let runningOwe = 0;
         state.entries.forEach(e => {
@@ -47,48 +61,130 @@
         });
     }
 
+    // Update Month banner
     function updateMonthBanner(d) {
         monthNameEl.textContent = d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
     }
 
+    // Build table rows
     function buildTable() {
         daysBody.innerHTML = '';
         let lastMonth = null;
 
         state.entries.forEach((e, idx) => {
-
             const dt = new Date(e.dateStr);
             const mn = dt.getMonth();
 
+            // Month separator
             if (lastMonth !== null && mn !== lastMonth) {
                 const trM = document.createElement('tr');
                 trM.classList.add('new-month');
                 trM.innerHTML = `<td colspan="5">New month<br>${dt.toLocaleString(undefined, { month: 'long' })}</td>`;
                 daysBody.appendChild(trM);
-                updateMonthBanner(dt);
             }
             lastMonth = mn;
 
+            // Main row
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</td>
-                <td><input type="text" class="sale-input" data-idx="${idx}" value="${formatForDisplay(e.sale)}"></td>
-                <td><input type="text" class="paid-input" data-idx="${idx}" value="${formatForDisplay(e.paidIn)}"></td>
-                <td class="comm">${money(e.commission)}
-                    <span class="delete-btn" data-idx="${idx}">🗑</span>
-                    <button class="daily-account-btn">Details</button>
-                    <div class="daily-account"></div>
-                </td>
-                <td class="run"></td>`;
+    <td>${dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</td>
+    <td>
+        <input type="text" class="sale-input" data-idx="${idx}" value="${formatForDisplay(e.sale)}">
+    </td>
+    <td>
+        <input type="text" class="paid-input" data-idx="${idx}" value="${formatForDisplay(e.paidIn)}">
+    </td>
+    <td class="comm">
+        ${money(e.commission)}
+        <span class="delete-btn" data-idx="${idx}">🗑</span>
+        <button class="daily-account-btn">Details</button>
+    </td>
+    <td class="run"></td>
+`;
 
             daysBody.appendChild(tr);
 
-            const saleInput = tr.querySelector('.sale-input');
-            const paidInput = tr.querySelector('.paid-input');
-            const commEl = tr.querySelector('.comm');
-            const dailyAccount = tr.querySelector('.daily-account');
+            // ---- DETAILS ROW (appears under the main row)
+            const detailsRow = document.createElement('tr');
+            detailsRow.classList.add('details-row');
 
-            // delete
+            detailsRow.innerHTML = `
+    <td colspan="5">
+        <div class="daily-account">
+            <div>You sold: <strong class="d-sale"></strong></div>
+            <div>You earned: <strong class="d-earned"></strong></div>
+            <div>You paid: <strong class="d-paid"></strong></div>
+
+            <div>Short Payment: <strong class="d-short"></strong></div>
+            <div>Excess Payment: <strong class="d-excess"></strong></div>
+
+            <div>You owe: <strong class="d-owe"></strong></div>
+            <div>Company owes you: <strong class="d-company"></strong></div>
+        </div>
+    </td>
+`;
+
+            daysBody.appendChild(detailsRow);
+
+
+
+
+
+            /* ---- TOGGLE DETAILS (IMPORTANT FIX) ---- */
+            const detailsBtn = tr.querySelector('.daily-account-btn');
+            const dailyAccount = detailsRow.querySelector('.daily-account');
+
+
+            // new
+            function updateDetails() {
+                // Totals up to this day
+                const totals = state.entries.slice(0, idx + 1).reduce(
+                    (acc, x) => {
+                        acc.sales += Number(x.sale || 0);
+                        acc.paid += Number(x.paidIn || 0);
+                        acc.commission += Number(x.commission || 0);
+                        return acc;
+                    },
+                    { sales: 0, paid: 0, commission: 0 }
+                );
+
+                // Base differences
+                const shortPayment = Math.max(0, totals.sales - totals.paid);
+                const excessPayment = Math.max(0, totals.paid - totals.sales);
+
+                // Net after earnings
+                let balance = totals.paid + totals.commission - totals.sales;
+
+                // Who owes who (FINAL TRUTH)
+                const youOwe = balance < 0 ? Math.abs(balance) : 0;
+                const companyOwesYou = balance > 0 ? balance : 0;
+
+                // Update UI
+                dailyAccount.querySelector('.d-sale').textContent = money(totals.sales);
+                dailyAccount.querySelector('.d-earned').textContent = money(totals.commission);
+                dailyAccount.querySelector('.d-paid').textContent = money(totals.paid);
+
+                dailyAccount.querySelector('.d-short').textContent = money(shortPayment);
+                dailyAccount.querySelector('.d-excess').textContent = money(excessPayment);
+
+                dailyAccount.querySelector('.d-owe').textContent = money(youOwe);
+                dailyAccount.querySelector('.d-company').textContent = money(companyOwesYou);
+            }
+
+
+            updateDetails();
+
+
+
+
+
+
+            detailsBtn.addEventListener('click', () => {
+                dailyAccount.classList.toggle('open');
+            });
+
+
+            // Delete row
             tr.querySelector('.delete-btn').addEventListener('click', () => {
                 if (confirm('Delete this day?')) {
                     state.entries.splice(idx, 1);
@@ -98,139 +194,102 @@
                 }
             });
 
-            // SALE input
-            saleInput.addEventListener('input', () => {
-                const cleaned = saleInput.value.replace(/[^0-9.]/g, '');
-                saleInput.value = cleaned;
-                const val = parseNumberInput(cleaned);
+            // Sale input
+            tr.querySelector('.sale-input').addEventListener('input', e => {
+                const val = parseNumberInput(e.target.value);
                 if (isNaN(val)) return;
 
                 state.entries[idx].sale = val;
                 recompute();
                 recomputeYouOwe();
-                commEl.childNodes[0].textContent = money(state.entries[idx].commission);
                 updateRunningTotals();
                 updateSummary();
 
+                tr.querySelector('.comm').childNodes[0].textContent =
+                    money(state.entries[idx].commission);
 
+                updateDetails();
             });
 
-            saleInput.addEventListener('blur', () => {
-                saleInput.value = formatForDisplay(state.entries[idx].sale);
+
+            tr.querySelector('.sale-input').addEventListener('blur', e => {
+                e.target.value = formatForDisplay(state.entries[idx].sale);
             });
 
-            // PAID input
-            paidInput.addEventListener('input', () => {
-                const cleaned = paidInput.value.replace(/[^0-9.]/g, '');
-                paidInput.value = cleaned;
-                const val = parseNumberInput(cleaned);
+            // Paid input
+            tr.querySelector('.paid-input').addEventListener('input', e => {
+                const val = parseNumberInput(e.target.value);
                 if (isNaN(val)) return;
 
                 state.entries[idx].paidIn = val;
                 recomputeYouOwe();
                 updateRunningTotals();
                 updateSummary();
+
+                updateDetails();
             });
 
-            paidInput.addEventListener('blur', () => {
-                paidInput.value = formatForDisplay(state.entries[idx].paidIn);
-            });
-
-            // Details
-            tr.querySelector('.daily-account-btn').addEventListener('click', () => {
-
-                const sale = Number(state.entries[idx].sale || 0);
-                const paid = Number(state.entries[idx].paidIn || 0);
-                const com = Number(state.entries[idx].commission || 0);
-                const short = Math.max(0, sale - paid);
-                const excess = Math.max(0, paid - sale);
-                const youOwe = Number(state.entries[idx].youOwe || 0);
-
-                const runCommission = state.entries.slice(0, idx + 1)
-                    .reduce((a, b) => a + b.commission, 0);
-
-                const companyOwes = Math.max(0, runCommission - youOwe);
-
-                dailyAccount.innerHTML = `
-                You sold: ${money(sale)}<br>
-                    You earned: ${money(com)}<br>
-                        You paid: ${money(paid)}<br>
-                            Short Payment: ${money(short)}<br>
-                                Excess Payment: ${money(excess)}<br>
-                                    You owe: ${money(youOwe)}<br>
-                                        Company owes you: ${money(companyOwes)}<br>`;
-
-                dailyAccount.style.display =
-                    dailyAccount.style.display === 'block' ? 'none' : 'block';
-
+            tr.querySelector('.paid-input').addEventListener('blur', e => {
+                e.target.value = formatForDisplay(state.entries[idx].paidIn);
             });
 
         });
 
         updateRunningTotals();
         updateSummary();
-
     }
 
+    // Update running totals column
     function updateRunningTotals() {
-        let r = 0;
-        const rows = daysBody.querySelectorAll("tr:not(.new-month)");
-
-        state.entries.forEach((e, i) => {
-            r += Number(e.commission || 0);
-
-            if (rows[i]) {
-                rows[i].querySelector('.run').textContent = money(r);
-            }
+        let running = 0;
+        const mainRows = Array.from(daysBody.querySelectorAll('tr')).filter(r => !r.classList.contains('details-row'));
+        mainRows.forEach((row, idx) => {
+            const e = state.entries[idx];
+            running += Number(e.commission || 0);
+            row.querySelector('.run').textContent = money(running);
         });
     }
 
-
-
+    // Update summary at footer
     function updateSummary() {
         const totalSales = state.entries.reduce((s, e) => s + (+e.sale || 0), 0);
         const totalCom = state.entries.reduce((s, e) => s + (+e.commission || 0), 0);
-        const latestOwe = state.entries.length > 0 ? state.entries[state.entries.length - 1].youOwe : 0;
 
         totalSalesEl.textContent = money(totalSales);
-        // totalEarnedEl.textContent = money(Math.max(0, totalCom - latestOwe));
         totalEarnedEl.textContent = money(totalCom);
-
     }
 
-    // 🔥 INSERTED HERE EXACTLY  
+    // Handle percent select
     percentSelect.addEventListener('change', e => {
-        if (e.target.value === "custom") {
-            customPct.style.display = "inline-block";
+        if (e.target.value === 'custom') {
+            customPct.style.display = 'inline-block';
             customPct.focus();
         } else {
-            customPct.style.display = "none";
+            customPct.style.display = 'none';
             state.percent = Number(e.target.value);
             recompute();
             recomputeYouOwe();
-            buildTable();
-            selectedPctEl.textContent = state.percent + "%";
+            updateRunningTotals();
+            updateSummary();
+
+            selectedPctEl.textContent = state.percent + '%';
         }
     });
 
-    // 🔥 INSERTED HERE EXACTLY  
     customPct.addEventListener('input', e => {
         const v = Number(customPct.value) || 0;
         state.percent = v;
         recompute();
         recomputeYouOwe();
         buildTable();
-        selectedPctEl.textContent = state.percent + "%";
+        selectedPctEl.textContent = state.percent + '%';
     });
 
+    // Add next date
     function addNextDate() {
         let next;
         if (state.lastAddedDate) {
-            next = new Date(
-                state.lastAddedDate.getFullYear(),
-                state.lastAddedDate.getMonth(),
-                state.lastAddedDate.getDate() + 1
-            );
+            next = new Date(state.lastAddedDate.getFullYear(), state.lastAddedDate.getMonth(), state.lastAddedDate.getDate() + 1);
         } else {
             const now = new Date();
             next = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -238,7 +297,7 @@
         state.lastAddedDate = next;
 
         state.entries.push({
-            dateStr: next.toISOString().slice(0, 10),
+            dateStr: toLocalDateStr(next),
             sale: 0,
             paidIn: 0,
             commission: 0,
@@ -247,25 +306,29 @@
 
         recompute();
         recomputeYouOwe();
-        buildTable();
+        updateRunningTotals();
+        updateSummary();
+
+        updateMonthBanner(next); // update banner each time
     }
 
     addDayBtns.forEach(b => b.addEventListener('click', addNextDate));
 
+    // Clear month
     clearMonthBtn.addEventListener('click', () => {
-        if (confirm('Clear?')) initTableFromFirstOfMonth();
+        if (confirm('Clear all dates?')) initTableFromFirstOfMonth();
     });
 
     function initTableFromFirstOfMonth() {
         const now = new Date();
-        const f = new Date(now.getFullYear(), now.getMonth(), 1);
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
         state.entries = [];
         state.lastAddedDate = null;
 
-        for (let d = 0; d < 7; d++) {
-            const dt = new Date(f.getFullYear(), f.getMonth(), f.getDate() + d);
+        for (let i = 0; i < 7; i++) {
+            const dt = new Date(firstDay.getFullYear(), firstDay.getMonth(), firstDay.getDate() + i);
             state.entries.push({
-                dateStr: dt.toISOString().slice(0, 10),
+                dateStr: toLocalDateStr(dt),
                 sale: 0,
                 paidIn: 0,
                 commission: 0,
@@ -277,19 +340,20 @@
         recompute();
         recomputeYouOwe();
         buildTable();
-        updateMonthBanner(f);
+        updateMonthBanner(firstDay);
     }
 
+    // Export JSON
     exportBtn.addEventListener('click', () => {
         const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = "clark-data.json";
+        a.download = 'clark-data.json';
         a.click();
     });
 
+    // Import JSON
     importBtn.addEventListener('click', () => importFile.click());
-
     importFile.addEventListener('change', e => {
         const f = e.target.files[0];
         if (!f) return;
@@ -300,214 +364,24 @@
                 recompute();
                 recomputeYouOwe();
                 buildTable();
-            } catch (err) { alert("Invalid JSON"); }
+            } catch (err) { alert('Invalid JSON'); }
         }
         reader.readAsText(f);
     });
 
+    // Calculate button
     calcBtn.addEventListener('click', () => {
         recompute();
         recomputeYouOwe();
         buildTable();
     });
 
+    // Initialize
     function init() {
         initTableFromFirstOfMonth();
-        selectedPctEl.textContent = state.percent + "%";
+        selectedPctEl.textContent = state.percent + '%';
     }
 
     init();
 
 })();
-
-    (() => {
-
-        const percentSelect = document.getElementById('percentSelect');
-        const customPct = document.getElementById('customPct');
-        const selectedPctEl = document.getElementById('selectedPct');
-
-        const daysBody = document.getElementById('daysBody');
-        const addDayBtns = document.querySelectorAll('.add-day');
-
-        const totalSalesEl = document.getElementById('totalSales');
-        const totalEarnedEl = document.getElementById('totalEarned');
-
-        const clearMonthBtn = document.getElementById('clearMonthBtn');
-        const exportBtn = document.getElementById('exportBtn');
-        const importBtn = document.getElementById('importBtn');
-        const importFile = document.getElementById('importFile');
-
-        const monthNameEl = document.getElementById('monthName');
-        const calcBtn = document.getElementById('calcBtn');
-
-
-        let state = { percent: 10, entries: [], lastAddedDate: null };
-
-
-        const money = v => '₦' + (Number(v || 0))
-            .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-        function parseNumberInput(raw) {
-            if (!raw) return 0;
-            const cleaned = raw.replace(/[ ,]/g, '');
-            return Number(cleaned);
-        }
-
-        function formatForDisplay(num) {
-            return Number(num || 0)
-                .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        function recomputeYouOwe() {
-            let running = 0;
-            state.entries.forEach(e => {
-                running += Number(e.sale || 0) - Number(e.paidIn || 0);
-                e.youOwe = running;
-            });
-        }
-
-        function recomputeCommission() {
-            state.entries.forEach(e => {
-                e.commission = Number(e.sale || 0) * (state.percent / 100);
-            });
-        }
-
-        function updateSummary() {
-
-            const ts = state.entries.reduce((a, b) => a + Number(b.sale || 0), 0);
-            totalSalesEl.textContent = money(ts);
-
-            const tc = state.entries.reduce((a, b) => a + Number(b.commission || 0), 0);
-            const owe = state.entries.length ? Number(state.entries[state.entries.length - 1].youOwe || 0) : 0;
-
-            totalEarnedEl.textContent = money(Math.max(tc - owe, 0));
-        }
-
-        function updateRunningTotals() {
-
-            let running = 0;
-
-            state.entries.forEach((e, idx) => {
-                running += Number(e.commission || 0);
-
-                const row = daysBody.querySelectorAll("tr")[idx + (idx > 0 ? 1 : 0)];
-
-                if (row)
-                    row.querySelector(".run").textContent = money(running);
-            });
-        }
-
-        function buildTable() {
-
-            daysBody.innerHTML = "";
-            recomputeCommission();
-            recomputeYouOwe();
-
-            let lastMonth = null;
-
-            state.entries.forEach((e, idx) => {
-
-                const dt = new Date(e.dateStr);
-
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-<td>${dt.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</td>
-
-<td>
-<input type="text" class="sale-input" value="${formatForDisplay(e.sale)}">
-</td>
-
-<td>
-<input type="text" class="paid-input" value="${formatForDisplay(e.paidIn)}">
-</td>
-
-<td class="comm">
-${money(e.commission)}
-<span class="delete-btn" data-idx="${idx}">🗑</span>
-<button class="daily-account-btn">Details</button>
-<div class="daily-account"></div>
-</td>
-
-<td class="run"></td>
-`;
-
-                daysBody.appendChild(tr);
-
-                const saleInput = tr.querySelector(".sale-input");
-                const paidInput = tr.querySelector(".paid-input");
-                const commEl = tr.querySelector(".comm");
-
-                saleInput.addEventListener("input", () => {
-
-                    const val = parseNumberInput(saleInput.value);
-
-                    e.sale = isNaN(val) ? 0 : val;
-
-                    recomputeCommission();
-                    recomputeYouOwe();
-                    saleInput.value = saleInput.value;
-
-                    commEl.childNodes[0].textContent = money(e.commission);
-
-                    updateRunningTotals();
-                    updateSummary();
-                });
-
-                paidInput.addEventListener("input", () => {
-
-                    const val = parseNumberInput(paidInput.value);
-
-                    e.paidIn = isNaN(val) ? 0 : val;
-
-                    recomputeYouOwe();
-                    updateRunningTotals();
-                    updateSummary();
-                });
-
-                tr.querySelector(".delete-btn").addEventListener("click", () => {
-                    state.entries.splice(idx, 1);
-                    buildTable();
-                });
-
-            });
-
-            updateRunningTotals();
-            updateSummary();
-        }
-
-
-        function addNextDate() {
-            let next;
-            if (state.lastAddedDate)
-                next = new Date(state.lastAddedDate.getFullYear(), state.lastAddedDate.getMonth(), state.lastAddedDate.getDate() + 1);
-            else {
-                let now = new Date();
-                next = new Date(now.getFullYear(), now.getMonth(), 1);
-            }
-
-            state.entries.push({
-                dateStr: next.toISOString().slice(0, 10),
-                sale: 0, paidIn: 0, commission: 0, youOwe: 0
-            });
-
-            state.lastAddedDate = next;
-
-            buildTable();
-        }
-
-        addDayBtns.forEach(b => b.addEventListener('click', addNextDate));
-
-        calcBtn.addEventListener("click", () => {
-            recomputeCommission();
-            recomputeYouOwe();
-            updateRunningTotals();
-            updateSummary();
-        });
-
-        function init() {
-            addNextDate();
-        }
-
-        init();
-
-    })();

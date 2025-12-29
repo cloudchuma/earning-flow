@@ -1,252 +1,295 @@
- * {
-     box-sizing: border-box;
-     margin: 0;
-     padding: 0;
-     font-family: sans-serif;
- }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+        }
 
- body {
-     background: #f2f2f2;
-     color: #333;
- }
+        body {
+            background: #f2f2f2;
+            color: #333;
+        }
 
- .app {
-     max-width: 700px;
-     margin: 0 auto;
-     padding: 10px;
- }
+        .app {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 10px;
+        }
 
- header {
-     background: linear-gradient(90deg, #0056b3, #b30000);
-     color: #fff;
-     border-radius: 12px;
-     padding: 10px;
-     margin-bottom: 15px;
- }
+        header {
+            background: linear-gradient(90deg, #0056b3, #b30000);
+            color: #fff;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
 
- .brand {
-     display: flex;
-     align-items: center;
-     gap: 10px;
- }
+        }
 
- .brand img {
-     height: 50px;
-     width: 50px;
-     border-radius: 8px;
-     object-fit: cover;
- }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
- .title {
-     font-size: 1.4em;
-     font-weight: bold;
- }
+        .brand img {
+            height: 50px;
+            width: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
 
- .subtitle {
-     font-size: 1em;
-     color: #ffd;
- }
+        .title {
+            font-size: 1.4em;
+            font-weight: bold;
+        }
 
- .top-tabs {
-     margin-top: 10px;
-     display: flex;
-     gap: 10px;
- }
+        .subtitle {
+            font-size: 1em;
+            color: #ffd;
+        }
 
- .top-tabs button {
-     flex: 1;
-     padding: 8px;
-     border: none;
-     border-radius: 8px;
-     font-weight: bold;
-     color: #fff;
-     cursor: pointer;
- }
+        .top-tabs {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
 
- .top-tabs button.active {
-     background: #ffd;
-     color: #b30000;
- }
+        .top-tabs button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+        }
 
- .top-tabs button.inactive {
-     background: rgba(255, 255, 255, 0.3);
- }
+        .top-tabs button.active {
+            background: #ffd;
+            color: #b30000;
+        }
 
- .meta-row {
-     display: flex;
-     justify-content: space-between;
-     margin-bottom: 15px;
-     gap: 10px;
- }
+        .top-tabs button.inactive {
+            background: rgba(255, 255, 255, 0.3);
+        }
 
- .month-card,
- .pct-card {
-     flex: 1;
-     background: #fff;
-     border-radius: 12px;
-     padding: 10px;
-     text-align: center;
-     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
- }
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
 
- .month-card .big-number,
- .pct-card .pct-badge {
-     font-size: 1.4em;
-     font-weight: bold;
-     margin-top: 5px;
- }
+        .month-card,
+        .pct-card {
+            flex: 1;
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
 
- .muted {
-     color: #777;
-     font-size: 0.85em;
- }
+        .month-card .big-number,
+        .pct-card .pct-badge {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
 
- .top-actions,
- .footer-actions {
-     display: flex;
-     justify-content: space-between;
-     flex-wrap: wrap;
-     margin-bottom: 10px;
-     gap: 10px;
- }
+        .muted {
+            color: #777;
+            font-size: 0.85em;
+        }
 
- .actions {
-     display: flex;
-     gap: 5px;
-     align-items: center;
-     flex-wrap: wrap;
- }
+        .top-actions,
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
 
- select,
- input {
-     padding: 5px;
-     border-radius: 6px;
-     border: 1px solid #ccc;
-     width: 80px;
- }
+        .actions {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
- input.sale-input,
- input.paid-input {
-     width: 100px;
-     text-align: right;
-     font-weight: bold;
-     color: #333;
- }
+        select,
+        input {
+            padding: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            width: 80px;
+        }
 
- button.btn {
-     background: #0056b3;
-     color: #fff;
-     border: none;
-     padding: 6px 12px;
-     border-radius: 8px;
-     cursor: pointer;
-     font-weight: bold;
-     transition: 0.2s;
- }
+        input.sale-input,
+        input.paid-input {
+            width: 100px;
+            text-align: right;
+            font-weight: bold;
+            color: #333;
+        }
 
- button.btn:hover {
-     opacity: 0.9;
- }
+        button.btn {
+            background: #0056b3;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
 
- button.ghost {
-     background: #fff;
-     color: #b30000;
-     border: 1px solid #b30000;
- }
+        button.btn:hover {
+            opacity: 0.9;
+        }
 
- .input-error {
-     border: 2px solid red;
- }
+        button.ghost {
+            background: #fff;
+            color: #b30000;
+            border: 1px solid #b30000;
+        }
 
- table {
-     width: 100%;
-     border-collapse: collapse;
-     background: #fff;
-     border-radius: 12px;
-     overflow: hidden;
-     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
- }
+        .input-error {
+            border: 2px solid red;
+        }
 
- th,
- td {
-     padding: 8px;
-     text-align: left;
-     border-bottom: 1px solid #ddd;
- }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
 
- th {
-     background: #0056b3;
-     color: #fff;
- }
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
 
- td .comm,
- td .run {
-     font-weight: bold;
-     text-align: right;
-     color: #111;
- }
+        th {
+            background: #0056b3;
+            color: #fff;
+        }
 
- tr.new-month td {
-     text-align: center;
-     font-weight: bold;
-     color: #b30000;
-     background: rgba(179, 0, 0, 0.1);
- }
+        td .comm,
+        td .run {
+            font-weight: bold;
+            text-align: right;
+            color: #111;
+        }
 
- td .delete-btn {
-     color: red;
-     font-weight: bold;
-     cursor: pointer;
-     margin-left: 5px;
- }
+        tr.new-month td {
+            text-align: center;
+            font-weight: bold;
+            color: #b30000;
+            background: rgba(179, 0, 0, 0.1);
+        }
 
- .daily-account {
-     display: none;
-     background: #f9f9f9;
-     padding: 5px;
-     border-radius: 6px;
-     margin-top: 4px;
-     font-size: 0.85em;
-     width: 200px;
-     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-     position: absolute;
-     z-index: 100;
- }
+        td .delete-btn {
+            color: red;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 5px;
+        }
 
- .daily-account-btn {
-     margin-left: 5px;
-     background: #b30000;
-     color: #fff;
-     border: none;
-     padding: 2px 5px;
-     border-radius: 4px;
-     cursor: pointer;
-     font-size: 0.8em;
- }
+        /* .daily-account {
+            display: none;
+            background: #f9f9f9;
+            padding: 5px;
+            border-radius: 6px;
+            margin-top: 4px;
+            font-size: 0.85em;
+            width: 200px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            z-index: 100;
+        } */
 
- footer .totals {
-     display: flex;
-     justify-content: space-around;
-     margin-top: 10px;
-     gap: 10px;
- }
+        .daily-account {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0 10px;
+            transition: max-height 0.3s ease, opacity 0.25s ease;
+        }
 
- .stat {
-     background: #fff;
-     border-radius: 12px;
-     padding: 10px;
-     flex: 1;
-     text-align: center;
-     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
- }
+        .daily-account.open {
+            max-height: 200px;
+            opacity: 1;
+            padding: 10px;
+        }
 
- .red-line {
-     font-weight: bold;
-     color: red;
-     display: block;
-     margin-top: 3px;
- }
+        .daily-account-btn {
+            margin-left: 5px;
+            background: #b30000;
+            color: #fff;
+            border: none;
+            padding: 2px 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
 
- .footer-actions {
-     margin-top: 10px;
- }
+        .details-row {
+            background: #fafafa;
+        }
+
+        .details-row.open {
+            display: table-row;
+        }
+
+        .details-row .daily-account {
+            padding: 10px;
+            animation: slideDown 0.25s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+
+
+        footer .totals {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            gap: 10px;
+        }
+
+        .stat {
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .red-line {
+            font-weight: bold;
+            color: red;
+            display: block;
+            margin-top: 3px;
+        }
+
+        .footer-actions {
+            margin-top: 10px;
+        }
