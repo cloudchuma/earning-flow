@@ -99,7 +99,7 @@
     </td>
     <td class="comm">
         ${money(e.commission)}
-        <span class="delete-btn" data-idx="${idx}">🗑</span>
+        <span class="delete-btn" data-idx="${idx}">❌</span>
         <button class="daily-account-btn">Details</button>
     </td>
     <td class="run"></td>
