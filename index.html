@@ -78,19 +78,63 @@
             <button class="btn" id="calcBtn">Calculate month</button>
         </div>
     
+        <section id="monthSummary" class="month-summary hidden">
+            <div class="summary-card">
+                <h2>Monthly Statement</h2>
+                <p class="muted" id="summaryMonth"></p>
+    
+                <div class="summary-grid">
+                    <div>
+                        <span>Total Sales</span>
+                        <strong id="msSales">₦0.00</strong>
+                    </div>
+                    <div>
+                        <span>Total Paid</span>
+                        <strong id="msPaid">₦0.00</strong>
+                    </div>
+                    <div>
+                        <span>Total Earned</span>
+                        <strong id="msEarned">₦0.00</strong>
+                    </div>
+                    <div>
+                        <span>Final Balance</span>
+                        <strong id="msBalance">₦0.00</strong>
+                    </div>
+                </div>
+    
+                <div id="paymentVerdict" class="verdict"></div>
+    
+                <button id="backToTable" class="btn-secondary">
+                    ← Back to daily records
+                </button>
+            </div>
+        </section>
+    
+    
         <footer>
             <div class="totals">
                 <div class="stat">
-                    <div class="small muted">Total sales</div>
+                    <div class="small muted">Total Sales</div>
                     <div id="totalSales">₦0.00</div>
                 </div>
                 <div class="stat">
-                    <div class="small muted">Total earned</div>
+                    <div class="small muted">Total Paid</div>
+                    <div id="totalPaid">₦0.00</div>
+                </div>
+                <div class="stat">
+                    <div class="small muted">Total Earned</div>
                     <div id="totalEarned">₦0.00</div>
+                </div>
+                <div class="stat">
+                    <div class="small muted">Earned Balance</div>
+                    <div id="totalEarnedBalance">₦0.00</div>
                 </div>
             </div>
         </footer>
+    
+    
     </div>
+
         <script src="izy-clark-app-flow.js">
 
         </script>
